@@ -369,7 +369,7 @@ router.post('/:id/participants', async (req: Request, res: Response): Promise<vo
               positionId: entry.positionId,
               playerName: entry.playerName ?? null,
               spp: entry.spp ?? 0,
-              injuries: entry.injuries ?? null,
+              injured: entry.injured ?? false,
               skills: entry.skillIds
                 ? { create: entry.skillIds.map((skillId) => ({ skillId })) }
                 : undefined,
@@ -450,7 +450,7 @@ router.put(
               positionId: entry.positionId,
               playerName: entry.playerName ?? null,
               spp: entry.spp ?? 0,
-              injuries: entry.injuries ?? null,
+              injured: entry.injured ?? false,
               skills: entry.skillIds
                 ? {
                     create: entry.skillIds.map((skillId) => ({ skillId })),
