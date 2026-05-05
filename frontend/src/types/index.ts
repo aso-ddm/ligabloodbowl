@@ -48,6 +48,8 @@ export interface Participant {
   hasApothecary: boolean;
   teamValue: number;
   isVeteran: boolean;
+  cheerleaders: number;
+  assistantCoaches: number;
   player: Player;
   race: Race;
 }
@@ -175,4 +177,9 @@ export interface RosterEntryInput {
   skillIds?: number[];
   spp?: number;
   injuries?: string;
+  mvUp?: number;
+  stUp?: number;
+  agUp?: number;
+  paUp?: number;
+  avUp?: number;
 }

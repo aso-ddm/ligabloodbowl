@@ -77,15 +77,24 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     // Calculate team value
     const rerolls = body.rerolls ?? participant.rerolls;
     const hasApothecary = body.hasApothecary ?? participant.hasApothecary;
+    const cheerleaders = Math.min(6, Math.max(0, body.cheerleaders ?? participant.cheerleaders));
+    const assistantCoaches = Math.min(6, Math.max(0, body.assistantCoaches ?? participant.assistantCoaches));
     const rerollCost = participant.race.rerollCost;
 
-    // Sum position costs from roster
+    // Sum position costs + attribute upgrade costs from roster
+    const UPGRADE_COSTS = { mv: 20000, st: 60000, ag: 30000, pa: 20000, av: 10000 };
     let rosterValue = 0;
     for (const entry of roster) {
       const position = await prisma.position.findUnique({ where: { id: entry.positionId } });
       if (position) rosterValue += position.cost;
+      rosterValue += (entry.mvUp ?? 0) * UPGRADE_COSTS.mv;
+      rosterValue += (entry.stUp ?? 0) * UPGRADE_COSTS.st;
+      rosterValue += (entry.agUp ?? 0) * UPGRADE_COSTS.ag;
+      rosterValue += (entry.paUp ?? 0) * UPGRADE_COSTS.pa;
+      rosterValue += (entry.avUp ?? 0) * UPGRADE_COSTS.av;
     }
-    const teamValue = rosterValue + rerolls * rerollCost + (hasApothecary ? 50000 : 0);
+    const teamValue = rosterValue + rerolls * rerollCost + (hasApothecary ? 50000 : 0)
+      + cheerleaders * 10000 + assistantCoaches * 10000;
 
     // Save snapshot to history before overwriting
     await prisma.rosterHistory.create({
@@ -112,6 +121,11 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
             playerName: entry.playerName ?? null,
             spp: entry.spp ?? 0,
             injuries: entry.injuries ?? null,
+            mvUp: entry.mvUp ?? 0,
+            stUp: entry.stUp ?? 0,
+            agUp: entry.agUp ?? 0,
+            paUp: entry.paUp ?? 0,
+            avUp: entry.avUp ?? 0,
             skills: entry.skillIds
               ? { create: entry.skillIds.map((skillId) => ({ skillId })) }
               : undefined,
@@ -130,6 +144,8 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
       data: {
         rerolls,
         hasApothecary,
+        cheerleaders,
+        assistantCoaches,
         teamValue,
         teamName: body.teamName !== undefined ? (body.teamName.trim() || null) : participant.teamName,
       },

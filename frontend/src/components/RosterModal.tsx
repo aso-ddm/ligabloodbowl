@@ -11,6 +11,11 @@ interface RosterEntryFull {
   playerName: string | null;
   spp: number;
   injuries: string | null;
+  mvUp: number;
+  stUp: number;
+  agUp: number;
+  paUp: number;
+  avUp: number;
   position: {
     id: number;
     name: string;
@@ -28,6 +33,8 @@ interface ParticipantFull {
   hasApothecary: boolean;
   teamValue: number;
   isVeteran: boolean;
+  cheerleaders: number;
+  assistantCoaches: number;
   player: { id: number; name: string };
   race: { id: number; name: string; rerollCost: number; imageUrl: string | null };
   roster: RosterEntryFull[];
@@ -41,6 +48,11 @@ interface EditRow {
   spp: number;
   injuries: string;
   additionalSkillIds: number[];
+  mvUp: number;
+  stUp: number;
+  agUp: number;
+  paUp: number;
+  avUp: number;
   // display helpers
   positionName: string;
   ma: number; st: number; ag: number; pa: number | null; av: number;
@@ -48,14 +60,32 @@ interface EditRow {
   cost: number;
 }
 
+const UPGRADE_COSTS = { mv: 20000, st: 60000, ag: 30000, pa: 20000, av: 10000 };
+
+function upgradeTV(row: EditRow) {
+  return row.mvUp * UPGRADE_COSTS.mv + row.stUp * UPGRADE_COSTS.st
+    + row.agUp * UPGRADE_COSTS.ag + row.paUp * UPGRADE_COSTS.pa + row.avUp * UPGRADE_COSTS.av;
+}
+
 const INJURY_OPTIONS = ['', 'MNG', '-MA', '-ST', '-AG', '-AV', 'Niggling', 'Muerto'];
+
+const PLAYER_RANKS = ['', 'Experimentado', 'Veterano', 'Estrella emergente', 'Estrella', 'Superestrella', 'Leyenda'];
+
+function playerRank(attrUps: number, skillUps: number): string {
+  const total = attrUps + skillUps;
+  return PLAYER_RANKS[Math.min(total, PLAYER_RANKS.length - 1)];
+}
+
+function totalAttrUps(e: RosterEntryFull) {
+  return e.mvUp + e.stUp + e.agUp + e.paUp + e.avUp;
+}
+
+function totalAttrUpsRow(r: EditRow) {
+  return r.mvUp + r.stUp + r.agUp + r.paUp + r.avUp;
+}
 
 function formatTV(n: number) {
   return (n / 1000).toFixed(0) + 'k MO';
-}
-
-function statDisplay(val: number | null) {
-  return val === null ? '—' : String(val);
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -70,6 +100,11 @@ interface Props {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function RosterModal({ participantId, canEdit, onClose, onSaved }: Props) {
+  useEffect(() => {
+    document.body.classList.add('overflow-hidden');
+    return () => document.body.classList.remove('overflow-hidden');
+  }, []);
+
   const [participant, setParticipant] = useState<ParticipantFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +113,8 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
   const [editRows, setEditRows] = useState<EditRow[]>([]);
   const [editRerolls, setEditRerolls] = useState(0);
   const [editApothecary, setEditApothecary] = useState(false);
+  const [editCheerleaders, setEditCheerleaders] = useState(0);
+  const [editAssistantCoaches, setEditAssistantCoaches] = useState(0);
   const [editTeamName, setEditTeamName] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -105,6 +142,8 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
       setAllSkills(skills);
       setEditRerolls(participant.rerolls);
       setEditApothecary(participant.hasApothecary);
+      setEditCheerleaders(participant.cheerleaders ?? 0);
+      setEditAssistantCoaches(participant.assistantCoaches ?? 0);
       setEditTeamName(participant.teamName ?? '');
       setEditRows(participant.roster.map((e) => ({
         positionId: e.positionId,
@@ -112,6 +151,11 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
         spp: e.spp,
         injuries: e.injuries ?? '',
         additionalSkillIds: e.skills.map((s) => s.skill.id),
+        mvUp: e.mvUp ?? 0,
+        stUp: e.stUp ?? 0,
+        agUp: e.agUp ?? 0,
+        paUp: e.paUp ?? 0,
+        avUp: e.avUp ?? 0,
         positionName: e.position.name,
         ma: e.position.ma, st: e.position.st, ag: e.position.ag,
         pa: e.position.pa, av: e.position.av,
@@ -138,8 +182,13 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
           spp: r.spp,
           injuries: r.injuries.trim() || undefined,
           skillIds: r.additionalSkillIds,
+          mvUp: r.mvUp,
+          stUp: r.stUp,
+          agUp: r.agUp,
+          paUp: r.paUp,
+          avUp: r.avUp,
         }));
-      await participantsApi.updateRoster(participantId, roster, editRerolls, editApothecary, editTeamName);
+      await participantsApi.updateRoster(participantId, roster, editRerolls, editApothecary, editTeamName, editCheerleaders, editAssistantCoaches);
       // Reload
       const updated = await participantsApi.getById(participantId);
       setParticipant(updated as unknown as ParticipantFull);
@@ -155,7 +204,8 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
   const addRow = () => {
     setEditRows((prev) => [...prev, {
       positionId: null, playerName: '', spp: 0, injuries: '',
-      additionalSkillIds: [], positionName: '', ma: 0, st: 0, ag: 0, pa: null, av: 0, baseSkills: [], cost: 0,
+      additionalSkillIds: [], mvUp: 0, stUp: 0, agUp: 0, paUp: 0, avUp: 0,
+      positionName: '', ma: 0, st: 0, ag: 0, pa: null, av: 0, baseSkills: [], cost: 0,
     }]);
   };
 
@@ -186,7 +236,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-2 pt-4 sm:p-4 sm:pt-8 overflow-y-auto">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       <div className="relative card w-full max-w-4xl shadow-2xl mb-8">
         {/* Modal header */}
@@ -222,9 +272,11 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
               {/* Stats bar */}
               <div className="flex flex-wrap gap-4 mb-5 text-sm">
                 <Stat label="Valor de equipo" value={formatTV(editing
-                  ? editRows.filter(r => r.cost).reduce((s, r) => s + r.cost, 0)
+                  ? editRows.filter(r => r.cost).reduce((s, r) => s + r.cost + upgradeTV(r), 0)
                     + editRerolls * participant.race.rerollCost
                     + (editApothecary ? 50000 : 0)
+                    + editCheerleaders * 10000
+                    + editAssistantCoaches * 10000
                   : participant.teamValue)} highlight />
                 {editing ? (
                   <>
@@ -247,11 +299,25 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                         className="w-3.5 h-3.5 accent-verde-500" />
                       <span className="text-parchment-300 text-xs">Apotecario</span>
                     </label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-parchment-400 text-xs">Animadoras:</span>
+                      <input type="number" min={0} max={6} value={editCheerleaders}
+                        onChange={(e) => setEditCheerleaders(Math.min(6, Math.max(0, Number(e.target.value))))}
+                        className="w-12 bg-white/5 border border-parchment-100/20 text-parchment-100 text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-parchment-400 text-xs">2º Entrenadores:</span>
+                      <input type="number" min={0} max={6} value={editAssistantCoaches}
+                        onChange={(e) => setEditAssistantCoaches(Math.min(6, Math.max(0, Number(e.target.value))))}
+                        className="w-12 bg-white/5 border border-parchment-100/20 text-parchment-100 text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
+                    </div>
                   </>
                 ) : (
                   <>
                     <Stat label="Re-rolls" value={String(participant.rerolls)} />
                     <Stat label="Apotecario" value={participant.hasApothecary ? 'Sí' : 'No'} />
+                    <Stat label="Animadoras" value={String(participant.cheerleaders ?? 0)} />
+                    <Stat label="2º Entrenadores" value={String(participant.assistantCoaches ?? 0)} />
                     <Stat label="Jugadores" value={String(participant.roster.length)} />
                   </>
                 )}
@@ -276,7 +342,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                             <Th tooltip="Pase — dificultad para pasar el balón (menor es mejor). '—' indica que el jugador no puede pasar" className="pb-2 pr-2 w-8">PA</Th>
                             <Th tooltip="Armadura — dificultad para derribar al jugador tras un bloqueo (mayor es mejor)" className="pb-2 pr-2 w-8">AV</Th>
                             <th className="pb-2 pr-3 text-left">Habilidades</th>
-                            <Th tooltip="Star Player Points — puntos de experiencia. Con 6 se consigue una mejora menor; con 16 una habilidad doble o mejora de característica" className="pb-2 pr-3 w-10">SPP</Th>
+                            <th className="pb-2 pr-3 w-10 text-left text-parchment-400">PE</th>
                             <Th tooltip="Lesiones permanentes: MNG (Missing Next Game), -MA/-ST/-AG/-AV (reducción de característica), Niggling (tirada por partido), Muerto" align="left" className="pb-2">Lesiones</Th>
                           </tr>
                         </thead>
@@ -287,16 +353,20 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                               ...e.skills.map((s) => s.skill.name),
                             ];
                             const isDead = e.injuries?.toLowerCase().includes('muerto');
+                            const rank = playerRank(totalAttrUps(e), e.skills.length);
                             return (
                               <tr key={e.id} className={`border-b border-parchment-100/5 ${isDead ? 'opacity-40' : ''}`}>
                                 <td className="py-2 pr-3 text-parchment-400/50 font-mono">{i + 1}</td>
-                                <td className="py-2 pr-3 font-medium text-parchment-100">{e.playerName ?? <span className="text-parchment-400/40 italic">—</span>}</td>
+                                <td className="py-2 pr-3">
+                                  <div className="font-medium text-parchment-100">{e.playerName ?? <span className="text-parchment-400/40 italic">—</span>}</div>
+                                  {rank && <div className="text-[10px] text-terracota-400 font-medium mt-0.5">{rank}</div>}
+                                </td>
                                 <td className="py-2 pr-3 text-parchment-300">{e.position.name}</td>
-                                <td className="py-2 pr-2 text-center text-parchment-200">{e.position.ma}</td>
-                                <td className="py-2 pr-2 text-center text-parchment-200">{e.position.st}</td>
-                                <td className="py-2 pr-2 text-center text-parchment-200">{e.position.ag}</td>
-                                <td className="py-2 pr-2 text-center text-parchment-200">{statDisplay(e.position.pa)}</td>
-                                <td className="py-2 pr-2 text-center text-parchment-200">{e.position.av}</td>
+                                <td className="py-2 pr-2 text-center"><StatCell base={e.position.ma} up={e.mvUp} /></td>
+                                <td className="py-2 pr-2 text-center"><StatCell base={e.position.st} up={e.stUp} /></td>
+                                <td className="py-2 pr-2 text-center"><StatCell base={e.position.ag} up={e.agUp} /></td>
+                                <td className="py-2 pr-2 text-center"><StatCell base={e.position.pa} up={e.paUp} nullable /></td>
+                                <td className="py-2 pr-2 text-center"><StatCell base={e.position.av} up={e.avUp} /></td>
                                 <td className="py-2 pr-3">
                                   <div className="flex flex-wrap gap-1">
                                     {allSkills.length === 0
@@ -338,16 +408,27 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
               {editing && (
                 <div className="space-y-3">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
+                    <table className="table-fixed text-xs" style={{ minWidth: '820px' }}>
+                      <colgroup>
+                        <col style={{ width: '52px' }} />
+                        <col style={{ width: '130px' }} />
+                        <col style={{ width: '150px' }} />
+                        <col style={{ width: '52px' }} />
+                        <col style={{ width: '110px' }} />
+                        <col style={{ width: '210px' }} />
+                        <col style={{ width: '180px' }} />
+                        <col style={{ width: '24px' }} />
+                      </colgroup>
                       <thead>
                         <tr className="border-b border-parchment-100/10 text-parchment-400">
-                          <th className="pb-2 pr-2 text-left w-6">#</th>
-                          <th className="pb-2 pr-2 text-left min-w-[100px]">Nombre</th>
-                          <th className="pb-2 pr-2 text-left min-w-[140px]">Posición</th>
-                          <Th tooltip="Star Player Points — puntos de experiencia acumulados. 6=mejora menor, 16=habilidad doble o mejora de característica" className="pb-2 pr-2 w-12">SPP</Th>
-                          <Th tooltip="Lesión permanente: MNG (falta próximo partido), -MA/-ST/-AG/-AV (reducción de característica), Niggling (tirada por cada partido), Muerto" align="left" className="pb-2 pr-2 min-w-[100px]">Lesión</Th>
-                          <Th tooltip="Habilidades adquiridas durante el torneo — mejoras adicionales sobre las habilidades base de la posición" align="left" className="pb-2 min-w-[160px]">Habilidades extra</Th>
-                          <th className="pb-2 w-6"></th>
+                          <th className="pb-2 pr-2 text-left">#</th>
+                          <th className="pb-2 pr-2 text-left">Nombre</th>
+                          <th className="pb-2 pr-2 text-left">Posición</th>
+                          <th className="pb-2 pr-2 text-left">PE</th>
+                          <Th tooltip="Lesión permanente: MNG (falta próximo partido), -MA/-ST/-AG/-AV (reducción de característica), Niggling (tirada por cada partido), Muerto" align="left" className="pb-2 pr-2">Lesión</Th>
+                          <Th tooltip="Mejoras de atributo: MA (+20k), ST (+60k), AG (+30k), PA (+20k), AV (+10k)" align="left" className="pb-2 pr-2">Mejoras attr.</Th>
+                          <Th tooltip="Habilidades adquiridas durante el torneo — mejoras adicionales sobre las habilidades base de la posición" align="left" className="pb-2">Habilidades extra</Th>
+                          <th className="pb-2"></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -394,6 +475,16 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
   );
 }
 
+// ─── Stat cell con mejora ─────────────────────────────────────────────────────
+
+function StatCell({ base, up, nullable }: { base: number | null; up: number; nullable?: boolean }) {
+  if (nullable && base === null) return <span className="text-parchment-400/40">—</span>;
+  const effective = (base ?? 0) + up;
+  return up > 0
+    ? <span className="text-verde-400 font-bold">{effective}<sup className="text-[9px] ml-0.5">+{up}</sup></span>
+    : <span className="text-parchment-200">{effective}</span>;
+}
+
 // ─── Stat badge ───────────────────────────────────────────────────────────────
 
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
@@ -406,6 +497,19 @@ function Stat({ label, value, highlight }: { label: string; value: string; highl
 }
 
 // ─── Edit row ─────────────────────────────────────────────────────────────────
+
+function UpStepper({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      <span className="text-parchment-400/60 w-5 text-[10px]">{label}</span>
+      <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
+        className="w-4 h-4 flex items-center justify-center text-parchment-400 hover:text-dragon-400 border border-parchment-100/15 rounded text-[10px] leading-none transition-colors">−</button>
+      <span className={`w-4 text-center text-[11px] font-mono ${value > 0 ? 'text-verde-400 font-bold' : 'text-parchment-400/50'}`}>{value}</span>
+      <button type="button" onClick={() => onChange(value + 1)}
+        className="w-4 h-4 flex items-center justify-center text-parchment-400 hover:text-verde-400 border border-parchment-100/15 rounded text-[10px] leading-none transition-colors">+</button>
+    </div>
+  );
+}
 
 function EditRowComponent({
   row, idx, positions, allSkills, onPositionChange, onUpdate, onRemove, onToggleSkill,
@@ -422,29 +526,43 @@ function EditRowComponent({
   const [showSkillPicker, setShowSkillPicker] = useState(false);
   const inputCls = 'bg-white/5 border border-parchment-100/15 text-parchment-100 rounded px-2 py-1 text-xs outline-none focus:border-verde-500 w-full transition-colors';
 
+  const rank = playerRank(totalAttrUpsRow(row), row.additionalSkillIds.length);
+
   return (
     <tr className="border-b border-parchment-100/5">
-      <td className="py-1.5 pr-2 text-parchment-400/50 font-mono">{idx + 1}</td>
-      <td className="py-1.5 pr-2">
+      <td className="py-1.5 pr-2 text-center overflow-hidden">
+        <div className="text-parchment-400/50 font-mono text-xs">{idx + 1}</div>
+        {rank && <div className="text-[9px] text-terracota-400 font-medium leading-tight mt-0.5 truncate">{rank}</div>}
+      </td>
+      <td className="py-1.5 pr-2 overflow-hidden">
         <input type="text" value={row.playerName} onChange={(e) => onUpdate(idx, { playerName: e.target.value })}
           placeholder="Opcional" className={inputCls} />
       </td>
-      <td className="py-1.5 pr-2">
+      <td className="py-1.5 pr-2 overflow-hidden">
         <select value={row.positionId ?? ''} onChange={(e) => onPositionChange(idx, e.target.value)}
           className="bg-white/5 border border-parchment-100/15 text-parchment-100 rounded px-2 py-1 text-xs outline-none focus:border-verde-500 w-full">
           <option value="">Seleccionar…</option>
           {positions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
       </td>
-      <td className="py-1.5 pr-2">
+      <td className="py-1.5 pr-2 overflow-hidden">
         <input type="number" min={0} value={row.spp} onChange={(e) => onUpdate(idx, { spp: Math.max(0, Number(e.target.value)) })}
-          className="bg-white/5 border border-parchment-100/15 text-parchment-100 text-center rounded px-1 py-1 text-xs outline-none focus:border-verde-500 w-12" />
+          className="bg-white/5 border border-parchment-100/15 text-parchment-100 text-center rounded px-1 py-1 text-xs outline-none focus:border-verde-500 w-full" />
       </td>
-      <td className="py-1.5 pr-2">
+      <td className="py-1.5 pr-2 overflow-hidden">
         <select value={row.injuries} onChange={(e) => onUpdate(idx, { injuries: e.target.value })}
           className="bg-white/5 border border-parchment-100/15 text-parchment-100 rounded px-2 py-1 text-xs outline-none focus:border-verde-500 w-full">
           {INJURY_OPTIONS.map((o) => <option key={o} value={o}>{o || 'Sin lesión'}</option>)}
         </select>
+      </td>
+      <td className="py-1.5 pr-2">
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          <UpStepper label="MA" value={row.mvUp} onChange={(v) => onUpdate(idx, { mvUp: v })} />
+          <UpStepper label="ST" value={row.stUp} onChange={(v) => onUpdate(idx, { stUp: v })} />
+          <UpStepper label="AG" value={row.agUp} onChange={(v) => onUpdate(idx, { agUp: v })} />
+          <UpStepper label="PA" value={row.paUp} onChange={(v) => onUpdate(idx, { paUp: v })} />
+          <UpStepper label="AV" value={row.avUp} onChange={(v) => onUpdate(idx, { avUp: v })} />
+        </div>
       </td>
       <td className="py-1.5 pr-2 relative">
         <div className="flex flex-wrap gap-1 items-center">
