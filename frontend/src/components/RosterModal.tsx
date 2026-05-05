@@ -118,7 +118,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
   const [editCheerleaders, setEditCheerleaders] = useState(0);
   const [editAssistantCoaches, setEditAssistantCoaches] = useState(0);
   const [editFanFactor, setEditFanFactor] = useState(0);
-  const [editTreasury, setEditTreasury] = useState(1000000);
+  const [editMatchGold, setEditMatchGold] = useState(0);
   const [editTeamName, setEditTeamName] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -149,7 +149,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
       setEditCheerleaders(participant.cheerleaders ?? 0);
       setEditAssistantCoaches(participant.assistantCoaches ?? 0);
       setEditFanFactor(participant.fanFactor ?? 0);
-      setEditTreasury(participant.treasury ?? 1000000);
+      setEditMatchGold(0);
       setEditTeamName(participant.teamName ?? '');
       setEditRows(participant.roster.map((e) => ({
         positionId: e.positionId,
@@ -194,7 +194,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
           paUp: r.paUp,
           avUp: r.avUp,
         }));
-      await participantsApi.updateRoster(participantId, roster, editRerolls, editApothecary, editTeamName, editCheerleaders, editAssistantCoaches, editFanFactor, editTreasury);
+      await participantsApi.updateRoster(participantId, roster, editRerolls, editApothecary, editTeamName, editCheerleaders, editAssistantCoaches, editFanFactor, undefined, editMatchGold || undefined);
       // Reload
       const updated = await participantsApi.getById(participantId);
       setParticipant(updated as unknown as ParticipantFull);
@@ -324,10 +324,10 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                         className="w-12 bg-white/5 border border-parchment-100/20 text-parchment-100 text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-parchment-400 text-xs">Tesorería (MO):</span>
-                      <input type="number" min={0} step={1000} value={editTreasury}
-                        onChange={(e) => setEditTreasury(Math.max(0, Number(e.target.value)))}
-                        className="w-24 bg-white/5 border border-parchment-100/20 text-terracota-400 font-bold text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
+                      <span className="text-parchment-400 text-xs">Oro partido (MO):</span>
+                      <input type="number" min={0} step={1000} value={editMatchGold}
+                        onChange={(e) => setEditMatchGold(Math.max(0, Number(e.target.value)))}
+                        className="w-24 bg-white/5 border border-verde-500/40 text-verde-400 font-bold text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
                     </div>
                   </>
                 ) : (

@@ -55,9 +55,6 @@ router.post('/:id/result', async (req: Request, res: Response): Promise<void> =>
     }
     // null = draw
 
-    const homeGold = body.homeGold ?? 0;
-    const awayGold = body.awayGold ?? 0;
-
     const updated = await prisma.match.update({
       where: { id: matchId },
       data: {
@@ -65,26 +62,10 @@ router.post('/:id/result', async (req: Request, res: Response): Promise<void> =>
         awayTDs: body.awayTDs,
         homeCas: body.homeCas ?? null,
         awayCas: body.awayCas ?? null,
-        homeGold: homeGold || null,
-        awayGold: awayGold || null,
         status: 'COMPLETED',
         winnerId,
       },
     });
-
-    // Sumar oro ganado a la tesorería de cada participante
-    if (homeGold > 0 && match.homeParticipantId) {
-      await prisma.participant.update({
-        where: { id: match.homeParticipantId },
-        data: { treasury: { increment: homeGold } },
-      });
-    }
-    if (awayGold > 0 && match.awayParticipantId) {
-      await prisma.participant.update({
-        where: { id: match.awayParticipantId },
-        data: { treasury: { increment: awayGold } },
-      });
-    }
 
     // Check if all matches in the round are completed
     const roundMatches = await prisma.match.findMany({

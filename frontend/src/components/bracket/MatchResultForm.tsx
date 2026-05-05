@@ -14,8 +14,6 @@ export default function MatchResultForm({ match, onSuccess, onCancel }: Props) {
   const [awayTDs, setAwayTDs] = useState(match.awayTDs ?? 0);
   const [homeCas, setHomeCas] = useState(match.homeCas ?? 0);
   const [awayCas, setAwayCas] = useState(match.awayCas ?? 0);
-  const [homeGold, setHomeGold] = useState(match.homeGold ?? 0);
-  const [awayGold, setAwayGold] = useState(match.awayGold ?? 0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -28,7 +26,7 @@ export default function MatchResultForm({ match, onSuccess, onCancel }: Props) {
     setSubmitting(true);
     setError(null);
     try {
-      await matchesApi.submitResult(match.id, Number(homeTDs), Number(awayTDs), Number(homeCas), Number(awayCas), Number(homeGold), Number(awayGold));
+      await matchesApi.submitResult(match.id, Number(homeTDs), Number(awayTDs), Number(homeCas), Number(awayCas));
       onSuccess();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error al registrar resultado');
@@ -103,25 +101,6 @@ export default function MatchResultForm({ match, onSuccess, onCancel }: Props) {
             className="w-12 bg-white/5 border border-parchment-100/20 focus:border-terracota-500 text-parchment-100 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors"
           />
           <span className="text-left text-parchment-400/60 text-xs">Bajas</span>
-        </div>
-
-        {/* Oro row */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto_1fr] items-center gap-2">
-          <span className="text-right text-parchment-400/60 text-xs">Oro (MO)</span>
-          <input
-            type="number" value={homeGold}
-            onChange={(e) => setHomeGold(Math.max(0, Number(e.target.value)))}
-            min={0} step={1000}
-            className="w-12 bg-white/5 border border-parchment-100/20 focus:border-verde-500 text-verde-400 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors font-bold"
-          />
-          <span className="text-parchment-400/40 text-xs text-center">–</span>
-          <input
-            type="number" value={awayGold}
-            onChange={(e) => setAwayGold(Math.max(0, Number(e.target.value)))}
-            min={0} step={1000}
-            className="w-12 bg-white/5 border border-parchment-100/20 focus:border-verde-500 text-verde-400 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors font-bold"
-          />
-          <span className="text-left text-parchment-400/60 text-xs">Oro (MO)</span>
         </div>
 
         <div className="flex gap-2 pt-1 border-t border-parchment-100/10 justify-center">

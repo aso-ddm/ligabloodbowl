@@ -63,8 +63,6 @@ export interface MatchResultInput {
   awayTDs: number;
   homeCas?: number;
   awayCas?: number;
-  homeGold?: number;
-  awayGold?: number;
 }
 
 export interface UpdateRosterInput {
@@ -76,4 +74,5 @@ export interface UpdateRosterInput {
   assistantCoaches?: number;
   fanFactor?: number;
   treasury?: number;
+  matchGold?: number;
 }

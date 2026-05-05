@@ -98,13 +98,18 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     const teamValue = rosterValue + rerolls * rerollCost + (hasApothecary ? 50000 : 0)
       + cheerleaders * 10000 + assistantCoaches * 10000;
 
-    // Primera configuración del equipo: tesorería = 1.000.000 - gasto
-    // Actualizaciones posteriores: respetar la tesorería actual (ya incluye ganancias de partidos)
-    const treasury = body.treasury !== undefined
-      ? body.treasury
-      : isFirstRoster
-        ? Math.max(0, 1000000 - teamValue)
-        : participant.treasury;
+    // Primera configuración: tesorería = 1.000.000 - gasto inicial
+    // Actualizaciones: sumar oro de partido y descontar diferencia de valor de equipo
+    let treasury: number;
+    if (body.treasury !== undefined) {
+      treasury = body.treasury;
+    } else if (isFirstRoster) {
+      treasury = Math.max(0, 1000000 - teamValue);
+    } else {
+      const matchGold = body.matchGold ?? 0;
+      const spent = teamValue - participant.teamValue;
+      treasury = Math.max(0, participant.treasury + matchGold - spent);
+    }
 
     // Save snapshot to history before overwriting
     await prisma.rosterHistory.create({
