@@ -80,6 +80,7 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     const cheerleaders = Math.min(6, Math.max(0, body.cheerleaders ?? participant.cheerleaders));
     const assistantCoaches = Math.min(6, Math.max(0, body.assistantCoaches ?? participant.assistantCoaches));
     const fanFactor = Math.min(7, Math.max(0, body.fanFactor ?? participant.fanFactor));
+    const isFirstRoster = participant.roster.length === 0;
     const rerollCost = participant.race.rerollCost;
 
     // Sum position costs + attribute upgrade costs from roster
@@ -96,6 +97,14 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     }
     const teamValue = rosterValue + rerolls * rerollCost + (hasApothecary ? 50000 : 0)
       + cheerleaders * 10000 + assistantCoaches * 10000;
+
+    // Primera configuración del equipo: tesorería = 1.000.000 - gasto
+    // Actualizaciones posteriores: respetar la tesorería actual (ya incluye ganancias de partidos)
+    const treasury = body.treasury !== undefined
+      ? body.treasury
+      : isFirstRoster
+        ? Math.max(0, 1000000 - teamValue)
+        : participant.treasury;
 
     // Save snapshot to history before overwriting
     await prisma.rosterHistory.create({
@@ -149,6 +158,7 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
         assistantCoaches,
         fanFactor,
         teamValue,
+        treasury,
         teamName: body.teamName !== undefined ? (body.teamName.trim() || null) : participant.teamName,
       },
     });

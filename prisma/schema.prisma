@@ -98,6 +98,7 @@ model Participant {
   cheerleaders      Int             @default(0)
   assistantCoaches  Int             @default(0)
   fanFactor         Int             @default(0)
+  treasury          Int             @default(1000000)
   awayMatches   Match[]         @relation("AwayParticipant")
   homeMatches   Match[]         @relation("HomeParticipant")
   player        Player          @relation(fields: [playerId], references: [id])
@@ -163,6 +164,8 @@ model Match {
   awayTDs           Int?
   homeCas           Int?
   awayCas           Int?
+  homeGold          Int?
+  awayGold          Int?
   status            MatchStatus  @default(PENDING)
   winnerId          Int?
   createdAt         DateTime     @default(now())

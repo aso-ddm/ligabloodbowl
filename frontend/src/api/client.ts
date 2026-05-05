@@ -78,19 +78,19 @@ export const participants = {
     }),
   getById: (id: number) =>
     request<Participant & { roster: unknown[] }>(`/api/participants/${id}`),
-  updateRoster: (participantId: number, roster: unknown[], rerolls?: number, hasApothecary?: boolean, teamName?: string, cheerleaders?: number, assistantCoaches?: number, fanFactor?: number) =>
+  updateRoster: (participantId: number, roster: unknown[], rerolls?: number, hasApothecary?: boolean, teamName?: string, cheerleaders?: number, assistantCoaches?: number, fanFactor?: number, treasury?: number) =>
     request<unknown[]>(`/api/participants/${participantId}/roster`, {
       method: 'PUT',
-      body: JSON.stringify({ roster, rerolls, hasApothecary, teamName, cheerleaders, assistantCoaches, fanFactor }),
+      body: JSON.stringify({ roster, rerolls, hasApothecary, teamName, cheerleaders, assistantCoaches, fanFactor, treasury }),
     }),
 };
 
 // Matches
 export const matches = {
-  submitResult: (matchId: number, homeTDs: number, awayTDs: number, homeCas?: number, awayCas?: number) =>
+  submitResult: (matchId: number, homeTDs: number, awayTDs: number, homeCas?: number, awayCas?: number, homeGold?: number, awayGold?: number) =>
     request<unknown>(`/api/matches/${matchId}/result`, {
       method: 'POST',
-      body: JSON.stringify({ homeTDs, awayTDs, homeCas, awayCas }),
+      body: JSON.stringify({ homeTDs, awayTDs, homeCas, awayCas, homeGold, awayGold }),
     }),
 };
 
