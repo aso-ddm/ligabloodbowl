@@ -79,6 +79,7 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     const hasApothecary = body.hasApothecary ?? participant.hasApothecary;
     const cheerleaders = Math.min(6, Math.max(0, body.cheerleaders ?? participant.cheerleaders));
     const assistantCoaches = Math.min(6, Math.max(0, body.assistantCoaches ?? participant.assistantCoaches));
+    const fanFactor = Math.min(7, Math.max(0, body.fanFactor ?? participant.fanFactor));
     const rerollCost = participant.race.rerollCost;
 
     // Sum position costs + attribute upgrade costs from roster
@@ -146,6 +147,7 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
         hasApothecary,
         cheerleaders,
         assistantCoaches,
+        fanFactor,
         teamValue,
         teamName: body.teamName !== undefined ? (body.teamName.trim() || null) : participant.teamName,
       },

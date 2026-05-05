@@ -50,6 +50,7 @@ export interface Participant {
   isVeteran: boolean;
   cheerleaders: number;
   assistantCoaches: number;
+  fanFactor: number;
   player: Player;
   race: Race;
 }

@@ -35,6 +35,7 @@ interface ParticipantFull {
   isVeteran: boolean;
   cheerleaders: number;
   assistantCoaches: number;
+  fanFactor: number;
   player: { id: number; name: string };
   race: { id: number; name: string; rerollCost: number; imageUrl: string | null };
   roster: RosterEntryFull[];
@@ -115,6 +116,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
   const [editApothecary, setEditApothecary] = useState(false);
   const [editCheerleaders, setEditCheerleaders] = useState(0);
   const [editAssistantCoaches, setEditAssistantCoaches] = useState(0);
+  const [editFanFactor, setEditFanFactor] = useState(0);
   const [editTeamName, setEditTeamName] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -144,6 +146,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
       setEditApothecary(participant.hasApothecary);
       setEditCheerleaders(participant.cheerleaders ?? 0);
       setEditAssistantCoaches(participant.assistantCoaches ?? 0);
+      setEditFanFactor(participant.fanFactor ?? 0);
       setEditTeamName(participant.teamName ?? '');
       setEditRows(participant.roster.map((e) => ({
         positionId: e.positionId,
@@ -188,7 +191,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
           paUp: r.paUp,
           avUp: r.avUp,
         }));
-      await participantsApi.updateRoster(participantId, roster, editRerolls, editApothecary, editTeamName, editCheerleaders, editAssistantCoaches);
+      await participantsApi.updateRoster(participantId, roster, editRerolls, editApothecary, editTeamName, editCheerleaders, editAssistantCoaches, editFanFactor);
       // Reload
       const updated = await participantsApi.getById(participantId);
       setParticipant(updated as unknown as ParticipantFull);
@@ -311,6 +314,12 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                         onChange={(e) => setEditAssistantCoaches(Math.min(6, Math.max(0, Number(e.target.value))))}
                         className="w-12 bg-white/5 border border-parchment-100/20 text-parchment-100 text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-parchment-400 text-xs">Factor de hinchas:</span>
+                      <input type="number" min={0} max={7} value={editFanFactor}
+                        onChange={(e) => setEditFanFactor(Math.min(7, Math.max(0, Number(e.target.value))))}
+                        className="w-12 bg-white/5 border border-parchment-100/20 text-parchment-100 text-center rounded px-1 py-0.5 text-sm outline-none focus:border-verde-500" />
+                    </div>
                   </>
                 ) : (
                   <>
@@ -318,6 +327,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                     <Stat label="Apotecario" value={participant.hasApothecary ? 'Sí' : 'No'} />
                     <Stat label="Animadoras" value={String(participant.cheerleaders ?? 0)} />
                     <Stat label="2º Entrenadores" value={String(participant.assistantCoaches ?? 0)} />
+                    <Stat label="Factor de hinchas" value={String(participant.fanFactor ?? 0)} />
                     <Stat label="Jugadores" value={String(participant.roster.length)} />
                   </>
                 )}

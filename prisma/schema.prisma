@@ -97,6 +97,7 @@ model Participant {
   isVeteran         Boolean         @default(false)
   cheerleaders      Int             @default(0)
   assistantCoaches  Int             @default(0)
+  fanFactor         Int             @default(0)
   awayMatches   Match[]         @relation("AwayParticipant")
   homeMatches   Match[]         @relation("HomeParticipant")
   player        Player          @relation(fields: [playerId], references: [id])

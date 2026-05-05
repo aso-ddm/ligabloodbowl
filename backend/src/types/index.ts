@@ -72,4 +72,5 @@ export interface UpdateRosterInput {
   teamName?: string;
   cheerleaders?: number;
   assistantCoaches?: number;
+  fanFactor?: number;
 }
