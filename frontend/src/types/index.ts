@@ -180,7 +180,7 @@ export interface RosterEntryInput {
   playerName?: string;
   skillIds?: number[];
   spp?: number;
-  injuries?: string;
+  injured?: boolean;
   mvUp?: number;
   stUp?: number;
   agUp?: number;

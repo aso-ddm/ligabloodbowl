@@ -116,7 +116,7 @@ model RosterEntry {
   positionId    Int
   playerName    String?
   spp           Int                @default(0)
-  injuries      String?
+  injured       Boolean            @default(false)
   mvUp          Int                @default(0)
   stUp          Int                @default(0)
   agUp          Int                @default(0)

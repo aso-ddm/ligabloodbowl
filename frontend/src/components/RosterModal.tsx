@@ -10,7 +10,7 @@ interface RosterEntryFull {
   positionId: number;
   playerName: string | null;
   spp: number;
-  injuries: string | null;
+  injured: boolean;
   mvUp: number;
   stUp: number;
   agUp: number;
@@ -48,7 +48,7 @@ interface EditRow {
   positionId: number | null;
   playerName: string;
   spp: number;
-  injuries: string;
+  injured: boolean;
   additionalSkillIds: number[];
   mvUp: number;
   stUp: number;
@@ -65,11 +65,10 @@ interface EditRow {
 const UPGRADE_COSTS = { mv: 20000, st: 60000, ag: 30000, pa: 20000, av: 10000 };
 
 function upgradeTV(row: EditRow) {
+  if (row.injured) return 0;
   return row.mvUp * UPGRADE_COSTS.mv + row.stUp * UPGRADE_COSTS.st
     + row.agUp * UPGRADE_COSTS.ag + row.paUp * UPGRADE_COSTS.pa + row.avUp * UPGRADE_COSTS.av;
 }
-
-const INJURY_OPTIONS = ['', 'MNG', '-MA', '-ST', '-AG', '-AV', 'Niggling', 'Muerto'];
 
 const PLAYER_RANKS = ['', 'Experimentado', 'Veterano', 'Estrella emergente', 'Estrella', 'Superestrella', 'Leyenda'];
 
@@ -155,7 +154,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
         positionId: e.positionId,
         playerName: e.playerName ?? '',
         spp: e.spp,
-        injuries: e.injuries ?? '',
+        injured: e.injured ?? false,
         additionalSkillIds: e.skills.map((s) => s.skill.id),
         mvUp: e.mvUp ?? 0,
         stUp: e.stUp ?? 0,
@@ -186,7 +185,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
           positionId: r.positionId!,
           playerName: r.playerName.trim() || undefined,
           spp: r.spp,
-          injuries: r.injuries.trim() || undefined,
+          injured: r.injured,
           skillIds: r.additionalSkillIds,
           mvUp: r.mvUp,
           stUp: r.stUp,
@@ -209,7 +208,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
 
   const addRow = () => {
     setEditRows((prev) => [...prev, {
-      positionId: null, playerName: '', spp: 0, injuries: '',
+      positionId: null, playerName: '', spp: 0, injured: false,
       additionalSkillIds: [], mvUp: 0, stUp: 0, agUp: 0, paUp: 0, avUp: 0,
       positionName: '', ma: 0, st: 0, ag: 0, pa: null, av: 0, baseSkills: [], cost: 0,
     }]);
@@ -278,7 +277,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
               {/* Stats bar */}
               <div className="flex flex-wrap gap-4 mb-5 text-sm">
                 <Stat label="Valor de equipo" value={formatTV(editing
-                  ? editRows.filter(r => r.cost).reduce((s, r) => s + r.cost + upgradeTV(r), 0)
+                  ? editRows.filter(r => r.cost && !r.injured).reduce((s, r) => s + r.cost + upgradeTV(r), 0)
                     + editRerolls * participant.race.rerollCost
                     + (editApothecary ? 50000 : 0)
                     + editCheerleaders * 10000
@@ -372,10 +371,9 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                               ...e.position.skills.map((ps) => ps.skill.name),
                               ...e.skills.map((s) => s.skill.name),
                             ];
-                            const isDead = e.injuries?.toLowerCase().includes('muerto');
                             const rank = playerRank(totalAttrUps(e), e.skills.length);
                             return (
-                              <tr key={e.id} className={`border-b border-parchment-100/5 ${isDead ? 'opacity-40' : ''}`}>
+                              <tr key={e.id} className={`border-b border-parchment-100/5 ${e.injured ? 'opacity-40' : ''}`}>
                                 <td className="py-2 pr-3 text-parchment-400/50 font-mono">{i + 1}</td>
                                 <td className="py-2 pr-3">
                                   <div className="font-medium text-parchment-100">{e.playerName ?? <span className="text-parchment-400/40 italic">—</span>}</div>
@@ -400,9 +398,9 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                                 <td className="py-2 pr-3 text-center">
                                   <span className={`font-mono font-bold ${e.spp > 0 ? 'text-verde-400' : 'text-parchment-400/40'}`}>{e.spp}</span>
                                 </td>
-                                <td className="py-2">
-                                  {e.injuries
-                                    ? <span className="bg-dragon-400/15 text-dragon-400 px-1.5 py-0.5 rounded text-[10px] font-medium">{e.injuries}</span>
+                                <td className="py-2 text-center">
+                                  {e.injured
+                                    ? <span className="bg-dragon-400/15 text-dragon-400 px-1.5 py-0.5 rounded text-[10px] font-medium">Lesionado</span>
                                     : <span className="text-parchment-400/30">—</span>
                                   }
                                 </td>
@@ -569,11 +567,13 @@ function EditRowComponent({
         <input type="number" min={0} value={row.spp} onChange={(e) => onUpdate(idx, { spp: Math.max(0, Number(e.target.value)) })}
           className="bg-white/5 border border-parchment-100/15 text-parchment-100 text-center rounded px-1 py-1 text-xs outline-none focus:border-verde-500 w-full" />
       </td>
-      <td className="py-1.5 pr-2 overflow-hidden">
-        <select value={row.injuries} onChange={(e) => onUpdate(idx, { injuries: e.target.value })}
-          className="bg-white/5 border border-parchment-100/15 text-parchment-100 rounded px-2 py-1 text-xs outline-none focus:border-verde-500 w-full">
-          {INJURY_OPTIONS.map((o) => <option key={o} value={o}>{o || 'Sin lesión'}</option>)}
-        </select>
+      <td className="py-1.5 pr-2 text-center">
+        <input
+          type="checkbox"
+          checked={row.injured}
+          onChange={(e) => onUpdate(idx, { injured: e.target.checked })}
+          className="w-4 h-4 accent-dragon-400 cursor-pointer"
+        />
       </td>
       <td className="py-1.5 pr-2">
         <div className="flex flex-wrap gap-x-3 gap-y-1">

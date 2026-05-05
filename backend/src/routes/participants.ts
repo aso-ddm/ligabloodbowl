@@ -83,10 +83,11 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     const isFirstRoster = participant.roster.length === 0;
     const rerollCost = participant.race.rerollCost;
 
-    // Sum position costs + attribute upgrade costs from roster
+    // Sum position costs + attribute upgrade costs from roster (injured players excluded)
     const UPGRADE_COSTS = { mv: 20000, st: 60000, ag: 30000, pa: 20000, av: 10000 };
     let rosterValue = 0;
     for (const entry of roster) {
+      if (entry.injured) continue;
       const position = await prisma.position.findUnique({ where: { id: entry.positionId } });
       if (position) rosterValue += position.cost;
       rosterValue += (entry.mvUp ?? 0) * UPGRADE_COSTS.mv;
@@ -135,7 +136,7 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
             positionId: entry.positionId,
             playerName: entry.playerName ?? null,
             spp: entry.spp ?? 0,
-            injuries: entry.injuries ?? null,
+            injured: entry.injured ?? false,
             mvUp: entry.mvUp ?? 0,
             stUp: entry.stUp ?? 0,
             agUp: entry.agUp ?? 0,

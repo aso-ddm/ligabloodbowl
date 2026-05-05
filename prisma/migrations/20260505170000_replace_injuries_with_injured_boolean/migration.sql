@@ -1,0 +1,2 @@
+ALTER TABLE "RosterEntry" DROP COLUMN IF EXISTS "injuries";
+ALTER TABLE "RosterEntry" ADD COLUMN "injured" BOOLEAN NOT NULL DEFAULT false;
