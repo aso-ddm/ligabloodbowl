@@ -38,11 +38,13 @@
 
   /* ── Superficies ── */
   .card {
-    @apply bg-white border border-black/8 rounded-2xl shadow-sm;
+    @apply bg-white rounded-2xl shadow-sm;
+    border: 1px solid rgb(0 0 0 / 0.08);
   }
 
   .card-elevated {
-    @apply bg-white border border-black/8 rounded-2xl shadow-md;
+    @apply bg-white rounded-2xl shadow-md;
+    border: 1px solid rgb(0 0 0 / 0.08);
   }
 
   /* ── Formularios ── */
@@ -56,11 +58,14 @@
 
   /* ── Tablas ── */
   .table-header {
-    @apply bg-black/[0.025] border-b border-black/8 text-parchment-400 text-left text-xs uppercase tracking-wider;
+    @apply text-parchment-400 text-left text-xs uppercase tracking-wider;
+    background-color: rgb(0 0 0 / 0.025);
+    border-bottom: 1px solid rgb(0 0 0 / 0.08);
   }
 
   .table-row {
-    @apply border-b border-black/5 transition-colors;
+    @apply transition-colors;
+    border-bottom: 1px solid rgb(0 0 0 / 0.05);
   }
   .table-row:nth-child(even) {
     background-color: rgb(0 0 0 / 0.015);
