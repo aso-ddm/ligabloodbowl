@@ -26,7 +26,7 @@ export default function StatsPage() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-bold text-parchment-100">Estadísticas</h1>
 
-      <div className="flex gap-2 border-b border-parchment-100/10 pb-4">
+      <div className="flex gap-2 border-b border-black/8 pb-4">
         <button className={tabCls(tab === 'global')} onClick={() => setTab('global')}>Ranking global</button>
         <button className={tabCls(tab === 'factions')} onClick={() => setTab('factions')}>Por facción</button>
       </div>
@@ -72,11 +72,11 @@ function GlobalTable({ data }: { data: GlobalStats[] }) {
                 </td>
                 <td className="px-4 py-3 text-center text-parchment-400 hidden sm:table-cell">{s.tournamentsPlayed}</td>
                 <td className="px-4 py-3 text-center text-parchment-300">{s.played}</td>
-                <td className="px-4 py-3 text-center text-emerald-600 font-medium">{s.wins}</td>
+                <td className="px-4 py-3 text-center text-verde-500 font-medium">{s.wins}</td>
                 <td className="px-4 py-3 text-center text-parchment-400">{s.draws}</td>
                 <td className="px-4 py-3 text-center text-dragon-400">{s.losses}</td>
                 <td className="px-4 py-3 text-center text-parchment-100 font-bold">{s.points}</td>
-                <td className={`px-4 py-3 text-center font-medium hidden lg:table-cell ${s.tdDiff > 0 ? 'text-emerald-600' : s.tdDiff < 0 ? 'text-dragon-400' : 'text-parchment-400'}`}>
+                <td className={`px-4 py-3 text-center font-medium hidden lg:table-cell ${s.tdDiff > 0 ? 'text-verde-500' : s.tdDiff < 0 ? 'text-dragon-400' : 'text-parchment-400'}`}>
                   {s.tdDiff > 0 ? `+${s.tdDiff}` : s.tdDiff}
                 </td>
               </tr>
@@ -112,11 +112,11 @@ function FactionTable({ data }: { data: FactionStats[] }) {
                 <td className="px-4 py-3 text-parchment-100 font-medium">{f.raceName}</td>
                 <td className="px-4 py-3 text-center text-parchment-400 hidden sm:table-cell">{f.timesUsed}</td>
                 <td className="px-4 py-3 text-center text-parchment-300">{f.played}</td>
-                <td className="px-4 py-3 text-center text-emerald-600 font-medium">{f.wins}</td>
+                <td className="px-4 py-3 text-center text-verde-500 font-medium">{f.wins}</td>
                 <td className="px-4 py-3 text-center text-parchment-400">{f.draws}</td>
                 <td className="px-4 py-3 text-center text-dragon-400">{f.losses}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`font-bold ${f.winRate >= 50 ? 'text-emerald-600' : 'text-parchment-400'}`}>
+                  <span className={`font-bold ${f.winRate >= 50 ? 'text-verde-500' : 'text-parchment-400'}`}>
                     {f.winRate}%
                   </span>
                 </td>

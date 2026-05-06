@@ -49,12 +49,12 @@ export default function FormatSelector({ value, onChange }: Props) {
               opt.available
                 ? selected
                   ? 'border-verde-500 bg-verde-500/10 cursor-pointer'
-                  : 'border-parchment-100/20 hover:border-parchment-100/40 cursor-pointer'
-                : 'border-parchment-100/10 opacity-50 cursor-not-allowed',
+                  : 'border-black/10 hover:border-black/20 cursor-pointer'
+                : 'border-black/8 opacity-50 cursor-not-allowed',
             ].join(' ')}
           >
             {!opt.available && (
-              <span className="absolute top-2 right-2 text-[9px] font-bold uppercase tracking-widest text-parchment-400 bg-parchment-100/10 px-1.5 py-0.5 rounded">
+              <span className="absolute top-2 right-2 text-[9px] font-bold uppercase tracking-widest text-parchment-400 bg-black/[0.06] px-1.5 py-0.5 rounded">
                 Próximamente
               </span>
             )}

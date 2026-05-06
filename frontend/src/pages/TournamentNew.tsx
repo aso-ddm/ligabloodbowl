@@ -91,7 +91,7 @@ export default function TournamentNew() {
           </div>
 
           {form.format !== 'SINGLE_ELIMINATION' && (
-            <div className="grid sm:grid-cols-2 gap-4 p-4 bg-carbon-900 rounded-lg border border-parchment-100/10">
+            <div className="grid sm:grid-cols-2 gap-4 p-4 bg-black/[0.025] rounded-xl border border-black/8">
               <div>
                 <label className="block text-parchment-400 text-xs uppercase tracking-wider mb-1.5">Número de grupos</label>
                 <input type="number" value={form.groupCount} onChange={(e) => set('groupCount', Number(e.target.value))} className="input-field" min={1} max={16} />
@@ -110,7 +110,7 @@ export default function TournamentNew() {
             <textarea value={form.description} onChange={(e) => set('description', e.target.value)} className="input-field resize-none" rows={3} placeholder="Descripción opcional del torneo" />
           </div>
 
-          <div className="flex gap-3 pt-2 border-t border-parchment-100/10">
+          <div className="flex gap-3 pt-2 border-t border-black/8">
             <button type="submit" disabled={submitting} className="btn-primary inline-flex items-center gap-1.5">
               {submitting && <Spinner size="sm" />}
               {submitting ? 'Creando…' : 'Crear torneo'}

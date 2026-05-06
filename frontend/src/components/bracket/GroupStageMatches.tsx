@@ -190,7 +190,7 @@ export default function GroupStageMatches({ groupRounds, tournament, onResultSub
             <button
               type="button"
               onClick={() => setOpenJornada(isOpen ? -1 : jornada)}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-parchment-100/5 transition-colors group"
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-black/[0.025] transition-colors group"
             >
               <div className="flex items-center gap-3">
                 <span className="text-sm font-bold text-parchment-100 tracking-tight">
@@ -212,7 +212,7 @@ export default function GroupStageMatches({ groupRounds, tournament, onResultSub
 
             {/* Accordion content */}
             {isOpen && (
-              <div className="border-t border-parchment-100/8">
+              <div className="border-t border-black/5">
                 {groups.map(([groupNum, matches], gi) => (
                   <div key={groupNum}>
                     {/* Group separator — only if multiple groups */}
@@ -221,14 +221,14 @@ export default function GroupStageMatches({ groupRounds, tournament, onResultSub
                         <span className="text-[10px] font-bold text-parchment-400/40 uppercase tracking-widest">
                           Grupo {String.fromCharCode(64 + groupNum)}
                         </span>
-                        <div className="flex-1 h-px bg-parchment-100/8" />
+                        <div className="flex-1 h-px bg-black/[0.05]" />
                       </div>
                     )}
 
                     {/* Match rows */}
                     <div className={gi < groups.length - 1 ? 'pb-2' : 'pb-1'}>
                       {matches.map((match, mi) => (
-                        <div key={match.id} className={mi < matches.length - 1 ? 'border-b border-parchment-100/5' : ''}>
+                        <div key={match.id} className={mi < matches.length - 1 ? 'border-b border-black/5' : ''}>
                           <MatchRow
                             match={match}
                             tournament={tournament}

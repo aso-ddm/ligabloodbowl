@@ -184,11 +184,11 @@ export default function PlayerDetail() {
                         <td className="px-4 py-3 text-parchment-400 hidden sm:table-cell">{p.race.name}</td>
                         <td className="px-4 py-3 text-parchment-400 hidden md:table-cell">{p.teamName ?? '—'}</td>
                         <td className="px-4 py-3 text-center text-parchment-300">{s.played}</td>
-                        <td className="px-4 py-3 text-center text-emerald-600 font-medium">{s.wins}</td>
+                        <td className="px-4 py-3 text-center text-verde-500 font-medium">{s.wins}</td>
                         <td className="px-4 py-3 text-center text-parchment-400">{s.draws}</td>
                         <td className="px-4 py-3 text-center text-dragon-400">{s.losses}</td>
                         <td className="px-4 py-3 text-center text-parchment-100 font-bold">{s.points}</td>
-                        <td className={`px-4 py-3 text-center font-medium hidden lg:table-cell ${s.tdDiff > 0 ? 'text-emerald-600' : s.tdDiff < 0 ? 'text-dragon-400' : 'text-parchment-400'}`}>
+                        <td className={`px-4 py-3 text-center font-medium hidden lg:table-cell ${s.tdDiff > 0 ? 'text-verde-500' : s.tdDiff < 0 ? 'text-dragon-400' : 'text-parchment-400'}`}>
                           {s.tdDiff > 0 ? `+${s.tdDiff}` : s.tdDiff}
                         </td>
                       </tr>
