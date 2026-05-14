@@ -1,5 +1,6 @@
 services:
   bloodbowl_db:
+    container_name: bloodbowl_db
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-bloodbowl}
@@ -12,8 +13,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      proxy_network:
+        ipv4_address: 192.168.1.103
 
   bloodbowl_backend:
+    container_name: bloodbowl_backend
     image: asoddm/bloodbowl-backend:latest
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-bloodbowl}:${POSTGRES_PASSWORD:-bloodbowl}@bloodbowl_db:5432/${POSTGRES_DB:-bloodbowl}
@@ -22,13 +27,24 @@ services:
     depends_on:
       bloodbowl_db:
         condition: service_healthy
+    networks:
+      proxy_network:
+        ipv4_address: 192.168.1.102
 
   bloodbowl_frontend:
+    container_name: bloodbowl_frontend
     image: asoddm/bloodbowl-frontend:latest
     ports:
       - "${APP_PORT:-8080}:80"
     depends_on:
       - bloodbowl_backend
+    networks:
+      proxy_network:
+        ipv4_address: 192.168.1.101
 
 volumes:
   postgres_data:
+
+networks:
+  proxy_network:
+    external: true
