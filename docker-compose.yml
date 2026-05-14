@@ -30,17 +30,6 @@ services:
     depends_on:
       - backend
 
-  # Fase 0: poblar datos de referencia (razas, posiciones, habilidades)
-  # Uso: docker compose --profile tools run --rm scraper
-  scraper:
-    image: asoddm/bloodbowl-backend:latest
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-bloodbowl}:${POSTGRES_PASSWORD:-bloodbowl}@db:5432/${POSTGRES_DB:-bloodbowl}
-    depends_on:
-      db:
-        condition: service_healthy
-    command: ["npx", "ts-node", "scripts/scraper.ts"]
-    profiles: ["tools"]
 
 volumes:
   postgres_data:
