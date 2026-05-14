@@ -24,6 +24,8 @@ RUN cd backend && npx tsc
 FROM node:20-alpine AS production
 WORKDIR /app
 
+RUN apk add --no-cache openssl
+
 # Copy node_modules from builder (includes generated Prisma client + CLI)
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/backend/dist ./backend/dist
