@@ -1,5 +1,5 @@
 services:
-  db:
+  bloodbowl_db:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-bloodbowl}
@@ -13,23 +13,22 @@ services:
       timeout: 5s
       retries: 10
 
-  backend:
+  bloodbowl_backend:
     image: asoddm/bloodbowl-backend:latest
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-bloodbowl}:${POSTGRES_PASSWORD:-bloodbowl}@db:5432/${POSTGRES_DB:-bloodbowl}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bloodbowl}:${POSTGRES_PASSWORD:-bloodbowl}@bloodbowl_db:5432/${POSTGRES_DB:-bloodbowl}
       NODE_ENV: production
       PORT: 3001
     depends_on:
-      db:
+      bloodbowl_db:
         condition: service_healthy
 
-  frontend:
+  bloodbowl_frontend:
     image: asoddm/bloodbowl-frontend:latest
     ports:
       - "${APP_PORT:-8080}:80"
     depends_on:
-      - backend
-
+      - bloodbowl_backend
 
 volumes:
   postgres_data:
