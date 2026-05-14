@@ -111,6 +111,7 @@ model RosterEntry {
   id            Int                @id @default(autoincrement())
   participantId Int
   positionId    Int
+  dorsal        Int?
   playerName    String?
   spp           Int                @default(0)
   injuries      String?

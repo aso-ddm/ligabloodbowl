@@ -109,6 +109,7 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
           data: {
             participantId,
             positionId: entry.positionId,
+            dorsal: entry.dorsal ?? null,
             playerName: entry.playerName ?? null,
             spp: entry.spp ?? 0,
             injuries: entry.injuries ?? null,

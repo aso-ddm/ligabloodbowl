@@ -8,6 +8,7 @@ import Th from './ui/Th';
 interface RosterEntryFull {
   id: number;
   positionId: number;
+  dorsal: number | null;
   playerName: string | null;
   spp: number;
   injuries: string | null;
@@ -37,6 +38,7 @@ interface ParticipantFull {
 
 interface EditRow {
   positionId: number | null;
+  dorsal: string;
   playerName: string;
   spp: number;
   injuries: string;
@@ -108,6 +110,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
       setEditTeamName(participant.teamName ?? '');
       setEditRows(participant.roster.map((e) => ({
         positionId: e.positionId,
+        dorsal: e.dorsal != null ? String(e.dorsal) : '',
         playerName: e.playerName ?? '',
         spp: e.spp,
         injuries: e.injuries ?? '',
@@ -134,6 +137,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
         .filter((r) => r.positionId !== null)
         .map((r) => ({
           positionId: r.positionId!,
+          dorsal: r.dorsal.trim() !== '' ? Number(r.dorsal) : undefined,
           playerName: r.playerName.trim() || undefined,
           spp: r.spp,
           injuries: r.injuries.trim() || undefined,
@@ -154,7 +158,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
 
   const addRow = () => {
     setEditRows((prev) => [...prev, {
-      positionId: null, playerName: '', spp: 0, injuries: '',
+      positionId: null, dorsal: '', playerName: '', spp: 0, injuries: '',
       additionalSkillIds: [], positionName: '', ma: 0, st: 0, ag: 0, pa: null, av: 0, baseSkills: [], cost: 0,
     }]);
   };
@@ -267,7 +271,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b border-parchment-100/10 text-parchment-400">
-                            <th className="pb-2 pr-3 text-left w-8">#</th>
+                            <th className="pb-2 pr-3 text-left w-10">Dorsal</th>
                             <th className="pb-2 pr-3 text-left">Nombre</th>
                             <th className="pb-2 pr-3 text-left">Posición</th>
                             <Th tooltip="Movimiento — número de casillas que puede moverse el jugador por turno" className="pb-2 pr-2 w-8">MA</Th>
@@ -281,7 +285,12 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                           </tr>
                         </thead>
                         <tbody>
-                          {participant.roster.map((e, i) => {
+                          {[...participant.roster].sort((a, b) => {
+                            if (a.dorsal == null && b.dorsal == null) return 0;
+                            if (a.dorsal == null) return 1;
+                            if (b.dorsal == null) return -1;
+                            return a.dorsal - b.dorsal;
+                          }).map((e) => {
                             const allSkills = [
                               ...e.position.skills.map((ps) => ps.skill.name),
                               ...e.skills.map((s) => s.skill.name),
@@ -289,7 +298,9 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                             const isDead = e.injuries?.toLowerCase().includes('muerto');
                             return (
                               <tr key={e.id} className={`border-b border-parchment-100/5 ${isDead ? 'opacity-40' : ''}`}>
-                                <td className="py-2 pr-3 text-parchment-400/50 font-mono">{i + 1}</td>
+                                <td className="py-2 pr-3 font-mono font-bold text-parchment-300">
+                                  {e.dorsal != null ? e.dorsal : <span className="text-parchment-400/30">—</span>}
+                                </td>
                                 <td className="py-2 pr-3 font-medium text-parchment-100">{e.playerName ?? <span className="text-parchment-400/40 italic">—</span>}</td>
                                 <td className="py-2 pr-3 text-parchment-300">{e.position.name}</td>
                                 <td className="py-2 pr-2 text-center text-parchment-200">{e.position.ma}</td>
@@ -341,7 +352,7 @@ export default function RosterModal({ participantId, canEdit, onClose, onSaved }
                     <table className="w-full text-xs">
                       <thead>
                         <tr className="border-b border-parchment-100/10 text-parchment-400">
-                          <th className="pb-2 pr-2 text-left w-6">#</th>
+                          <th className="pb-2 pr-2 text-left w-16">Dorsal</th>
                           <th className="pb-2 pr-2 text-left min-w-[100px]">Nombre</th>
                           <th className="pb-2 pr-2 text-left min-w-[140px]">Posición</th>
                           <Th tooltip="Star Player Points — puntos de experiencia acumulados. 6=mejora menor, 16=habilidad doble o mejora de característica" className="pb-2 pr-2 w-12">SPP</Th>
@@ -424,7 +435,11 @@ function EditRowComponent({
 
   return (
     <tr className="border-b border-parchment-100/5">
-      <td className="py-1.5 pr-2 text-parchment-400/50 font-mono">{idx + 1}</td>
+      <td className="py-1.5 pr-2">
+        <input type="number" min={1} max={99} value={row.dorsal} onChange={(e) => onUpdate(idx, { dorsal: e.target.value })}
+          placeholder="—"
+          className="bg-white/5 border border-parchment-100/15 text-parchment-100 text-center rounded px-1 py-1 text-xs outline-none focus:border-verde-500 w-14" />
+      </td>
       <td className="py-1.5 pr-2">
         <input type="text" value={row.playerName} onChange={(e) => onUpdate(idx, { playerName: e.target.value })}
           placeholder="Opcional" className={inputCls} />

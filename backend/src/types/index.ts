@@ -22,6 +22,7 @@ export interface ApiError {
 
 export interface RosterEntryInput {
   positionId: number;
+  dorsal?: number;
   playerName?: string;
   skillIds?: number[];
   spp?: number;

@@ -20,7 +20,13 @@
       "Bash(git checkout:*)",
       "Bash(git push:*)",
       "Bash(git branch:*)",
-      "Bash(gh repo:*)"
+      "Bash(gh repo:*)",
+      "Bash(npm run *)",
+      "Bash(npx prisma *)",
+      "PowerShell(cd C:/Users/Usuario/Proyects/liga-bloodbowl; $env:PRISMA_MIGRATE_SKIP_GENERATE=\"1\"; npx prisma migrate dev --name add_player_name_unique --skip-seed 2>&1)",
+      "Bash(npx tsc *)",
+      "Bash(git remote *)",
+      "PowerShell(cd \"C:\\\\Users\\\\Usuario\\\\Proyects\\\\liga-bloodbowl\"; $env:PRISMA_MIGRATE_SKIP_GENERATE=\"1\"; npx prisma migrate dev --name add_dorsal_to_roster_entry --skip-seed 2>&1)"
     ]
   }
 }
