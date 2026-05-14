@@ -14,9 +14,7 @@ services:
       retries: 10
 
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
+    image: asoddm/bloodbowl-backend:latest
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-bloodbowl}:${POSTGRES_PASSWORD:-bloodbowl}@db:5432/${POSTGRES_DB:-bloodbowl}
       NODE_ENV: production
@@ -26,9 +24,7 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: asoddm/bloodbowl-frontend:latest
     ports:
       - "${APP_PORT:-80}:80"
     depends_on:
@@ -37,10 +33,7 @@ services:
   # Fase 0: poblar datos de referencia (razas, posiciones, habilidades)
   # Uso: docker compose --profile tools run --rm scraper
   scraper:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-      target: builder
+    image: asoddm/bloodbowl-backend:latest
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-bloodbowl}:${POSTGRES_PASSWORD:-bloodbowl}@db:5432/${POSTGRES_DB:-bloodbowl}
     depends_on:
