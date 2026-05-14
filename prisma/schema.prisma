@@ -92,10 +92,14 @@ model Participant {
   groupNumber   Int?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  hasApothecary Boolean         @default(false)
-  rerolls       Int             @default(0)
-  teamValue     Int             @default(0)
-  isVeteran     Boolean         @default(false)
+  hasApothecary     Boolean         @default(false)
+  rerolls           Int             @default(0)
+  teamValue         Int             @default(0)
+  isVeteran         Boolean         @default(false)
+  cheerleaders      Int             @default(0)
+  assistantCoaches  Int             @default(0)
+  fanFactor         Int             @default(0)
+  treasury          Int             @default(1000000)
   awayMatches   Match[]         @relation("AwayParticipant")
   homeMatches   Match[]         @relation("HomeParticipant")
   player        Player          @relation(fields: [playerId], references: [id])
@@ -114,7 +118,12 @@ model RosterEntry {
   dorsal        Int?
   playerName    String?
   spp           Int                @default(0)
-  injuries      String?
+  injured       Boolean            @default(false)
+  mvUp          Int                @default(0)
+  stUp          Int                @default(0)
+  agUp          Int                @default(0)
+  paUp          Int                @default(0)
+  avUp          Int                @default(0)
   participant   Participant        @relation(fields: [participantId], references: [id])
   position      Position           @relation(fields: [positionId], references: [id])
   skills        RosterEntrySkill[]
@@ -157,6 +166,8 @@ model Match {
   awayTDs           Int?
   homeCas           Int?
   awayCas           Int?
+  homeGold          Int?
+  awayGold          Int?
   status            MatchStatus  @default(PENDING)
   winnerId          Int?
   createdAt         DateTime     @default(now())

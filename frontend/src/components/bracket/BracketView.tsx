@@ -61,7 +61,7 @@ export default function BracketView({ bracket, tournament, standings, onResultSu
   return (
     <div className="space-y-4">
       {/* Tab bar */}
-      <div className="flex gap-1 border-b border-parchment-100/10">
+      <div className="flex gap-1 border-b border-black/8">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -74,7 +74,7 @@ export default function BracketView({ bracket, tournament, standings, onResultSu
           >
             {tab.label}
             {tab.badge && (
-              <span className="ml-1.5 text-[10px] px-1 py-0.5 rounded bg-parchment-100/10 text-parchment-400/60 leading-none">
+              <span className="ml-1.5 text-[10px] px-1 py-0.5 rounded bg-black/[0.06] text-parchment-400/60 leading-none">
                 {tab.badge}
               </span>
             )}

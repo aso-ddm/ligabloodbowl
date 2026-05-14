@@ -77,15 +77,40 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
     // Calculate team value
     const rerolls = body.rerolls ?? participant.rerolls;
     const hasApothecary = body.hasApothecary ?? participant.hasApothecary;
+    const cheerleaders = Math.min(6, Math.max(0, body.cheerleaders ?? participant.cheerleaders));
+    const assistantCoaches = Math.min(6, Math.max(0, body.assistantCoaches ?? participant.assistantCoaches));
+    const fanFactor = Math.min(7, Math.max(0, body.fanFactor ?? participant.fanFactor));
+    const isFirstRoster = participant.roster.length === 0;
     const rerollCost = participant.race.rerollCost;
 
-    // Sum position costs from roster
+    // Sum position costs + attribute upgrade costs from roster (injured players excluded)
+    const UPGRADE_COSTS = { mv: 20000, st: 60000, ag: 30000, pa: 20000, av: 10000 };
     let rosterValue = 0;
     for (const entry of roster) {
+      if (entry.injured) continue;
       const position = await prisma.position.findUnique({ where: { id: entry.positionId } });
       if (position) rosterValue += position.cost;
+      rosterValue += (entry.mvUp ?? 0) * UPGRADE_COSTS.mv;
+      rosterValue += (entry.stUp ?? 0) * UPGRADE_COSTS.st;
+      rosterValue += (entry.agUp ?? 0) * UPGRADE_COSTS.ag;
+      rosterValue += (entry.paUp ?? 0) * UPGRADE_COSTS.pa;
+      rosterValue += (entry.avUp ?? 0) * UPGRADE_COSTS.av;
     }
-    const teamValue = rosterValue + rerolls * rerollCost + (hasApothecary ? 50000 : 0);
+    const teamValue = rosterValue + rerolls * rerollCost + (hasApothecary ? 50000 : 0)
+      + cheerleaders * 10000 + assistantCoaches * 10000;
+
+    // Primera configuración: tesorería = 1.000.000 - gasto inicial
+    // Actualizaciones: sumar oro de partido y descontar diferencia de valor de equipo
+    let treasury: number;
+    if (body.treasury !== undefined) {
+      treasury = body.treasury;
+    } else if (isFirstRoster) {
+      treasury = Math.max(0, 1000000 - teamValue);
+    } else {
+      const matchGold = body.matchGold ?? 0;
+      const spent = teamValue - participant.teamValue;
+      treasury = Math.max(0, participant.treasury + matchGold - spent);
+    }
 
     // Save snapshot to history before overwriting
     await prisma.rosterHistory.create({
@@ -112,7 +137,12 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
             dorsal: entry.dorsal ?? null,
             playerName: entry.playerName ?? null,
             spp: entry.spp ?? 0,
-            injuries: entry.injuries ?? null,
+            injured: entry.injured ?? false,
+            mvUp: entry.mvUp ?? 0,
+            stUp: entry.stUp ?? 0,
+            agUp: entry.agUp ?? 0,
+            paUp: entry.paUp ?? 0,
+            avUp: entry.avUp ?? 0,
             skills: entry.skillIds
               ? { create: entry.skillIds.map((skillId) => ({ skillId })) }
               : undefined,
@@ -131,7 +161,11 @@ router.put('/:id/roster', requireReferenceData, async (req: Request, res: Respon
       data: {
         rerolls,
         hasApothecary,
+        cheerleaders,
+        assistantCoaches,
+        fanFactor,
         teamValue,
+        treasury,
         teamName: body.teamName !== undefined ? (body.teamName.trim() || null) : participant.teamName,
       },
     });

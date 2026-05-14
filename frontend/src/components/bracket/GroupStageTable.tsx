@@ -53,7 +53,7 @@ function GroupTable({
               <tr
                 key={s.participantId}
                 onClick={() => onViewRoster(s.participantId)}
-                className={`table-row cursor-pointer ${canEdit ? 'hover:bg-verde-500/5' : 'hover:bg-parchment-100/3'} ${isQualifier ? 'bg-verde-500/10 border-l-2 border-verde-500' : ''}`}
+                className={`table-row cursor-pointer ${canEdit ? 'hover:bg-verde-500/5' : 'hover:bg-black/[0.02]'} ${isQualifier ? 'bg-verde-500/10 border-l-2 border-verde-500' : ''}`}
               >
                 <td className="px-2 py-2.5 text-center">
                   {isQualifier

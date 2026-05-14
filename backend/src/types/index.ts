@@ -26,7 +26,12 @@ export interface RosterEntryInput {
   playerName?: string;
   skillIds?: number[];
   spp?: number;
-  injuries?: string;
+  injured?: boolean;
+  mvUp?: number;
+  stUp?: number;
+  agUp?: number;
+  paUp?: number;
+  avUp?: number;
 }
 
 export interface CreateTournamentInput {
@@ -66,4 +71,9 @@ export interface UpdateRosterInput {
   rerolls?: number;
   hasApothecary?: boolean;
   teamName?: string;
+  cheerleaders?: number;
+  assistantCoaches?: number;
+  fanFactor?: number;
+  treasury?: number;
+  matchGold?: number;
 }

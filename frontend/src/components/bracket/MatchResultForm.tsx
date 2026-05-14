@@ -53,7 +53,7 @@ export default function MatchResultForm({ match, onSuccess, onCancel }: Props) {
           onCancel={() => setShowConfirm(false)}
         />
       )}
-      <form onSubmit={handleSubmit} className="bg-carbon-900 border border-parchment-100/10 rounded-lg p-3 mt-2 space-y-3">
+      <form onSubmit={handleSubmit} className="bg-black/[0.025] border border-black/8 rounded-lg p-3 mt-2 space-y-3">
         {error && <p className="text-dragon-400 text-xs">{error}</p>}
 
         {/* Header row */}
@@ -72,14 +72,14 @@ export default function MatchResultForm({ match, onSuccess, onCancel }: Props) {
             type="number" value={homeTDs}
             onChange={(e) => setHomeTDs(Number(e.target.value))}
             min={0} max={99}
-            className="w-12 bg-white/5 border border-parchment-100/20 focus:border-verde-500 text-parchment-100 text-center rounded px-1 py-1.5 text-sm outline-none transition-colors"
+            className="w-12 bg-black/5 border border-black/10 focus:border-verde-500 text-parchment-100 text-center rounded px-1 py-1.5 text-sm outline-none transition-colors"
           />
           <span className="text-parchment-400/40 text-xs text-center">–</span>
           <input
             type="number" value={awayTDs}
             onChange={(e) => setAwayTDs(Number(e.target.value))}
             min={0} max={99}
-            className="w-12 bg-white/5 border border-parchment-100/20 focus:border-verde-500 text-parchment-100 text-center rounded px-1 py-1.5 text-sm outline-none transition-colors"
+            className="w-12 bg-black/5 border border-black/10 focus:border-verde-500 text-parchment-100 text-center rounded px-1 py-1.5 text-sm outline-none transition-colors"
           />
           <div />
         </div>
@@ -91,19 +91,19 @@ export default function MatchResultForm({ match, onSuccess, onCancel }: Props) {
             type="number" value={homeCas}
             onChange={(e) => setHomeCas(Number(e.target.value))}
             min={0} max={99}
-            className="w-12 bg-white/5 border border-parchment-100/20 focus:border-terracota-500 text-parchment-100 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors"
+            className="w-12 bg-black/5 border border-black/10 focus:border-terracota-500 text-parchment-100 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors"
           />
           <span className="text-parchment-400/40 text-xs text-center">–</span>
           <input
             type="number" value={awayCas}
             onChange={(e) => setAwayCas(Number(e.target.value))}
             min={0} max={99}
-            className="w-12 bg-white/5 border border-parchment-100/20 focus:border-terracota-500 text-parchment-100 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors"
+            className="w-12 bg-black/5 border border-black/10 focus:border-terracota-500 text-parchment-100 text-center rounded px-1 py-1.5 text-xs outline-none transition-colors"
           />
           <span className="text-left text-parchment-400/60 text-xs">Bajas</span>
         </div>
 
-        <div className="flex gap-2 pt-1 border-t border-parchment-100/10 justify-center">
+        <div className="flex gap-2 pt-1 border-t border-black/8 justify-center">
           <button type="submit" disabled={submitting} className="btn-primary text-xs py-1.5 px-3">
             {submitting ? 'Guardando…' : isUpdate ? 'Actualizar' : 'Guardar'}
           </button>

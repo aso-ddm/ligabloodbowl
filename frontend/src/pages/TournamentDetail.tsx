@@ -390,7 +390,7 @@ function GroupAssignment({
                     key={p.id}
                     draggable
                     onDragStart={() => setDragId(p.id)}
-                    className="flex items-center justify-between gap-2 bg-parchment-100/5 hover:bg-parchment-100/10 rounded px-2 py-1.5 cursor-grab active:cursor-grabbing transition-colors"
+                    className="flex items-center justify-between gap-2 bg-black/[0.03] hover:bg-black/[0.05] rounded px-2 py-1.5 cursor-grab active:cursor-grabbing transition-colors"
                   >
                     <div className="min-w-0">
                       <p className="text-parchment-100 text-xs font-medium truncate">{p.player.name}</p>
@@ -486,7 +486,7 @@ function RegisterForm({ tournamentId, onSuccess }: { tournamentId: number; onSuc
       <h3 className="font-display font-bold text-parchment-100">Inscribir jugador</h3>
       {error && <p className="text-dragon-400 text-xs bg-dragon-500/10 border border-dragon-500/20 rounded p-2">{error}</p>}
 
-      <div className="flex gap-2 text-xs border-b border-parchment-100/10 pb-3">
+      <div className="flex gap-2 text-xs border-b border-black/8 pb-3">
         <button type="button" onClick={() => setStep(1)}
           className={`px-3 py-1.5 rounded transition-colors ${step === 1 ? 'bg-verde-500 text-white' : 'text-parchment-400 hover:text-parchment-100'}`}>
           1. Datos básicos
@@ -524,14 +524,14 @@ function RegisterForm({ tournamentId, onSuccess }: { tournamentId: number; onSuc
                 <button
                   type="button"
                   onClick={() => setIsVeteran(false)}
-                  className={`flex-1 py-2 px-3 rounded text-xs font-semibold transition-colors ${!isVeteran ? 'bg-verde-500 text-white' : 'bg-parchment-100/10 text-parchment-400 hover:text-parchment-100'}`}
+                  className={`flex-1 py-2 px-3 rounded text-xs font-semibold transition-colors ${!isVeteran ? 'bg-verde-500 text-white' : 'bg-black/[0.06] text-parchment-400 hover:text-parchment-100'}`}
                 >
                   Novato
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsVeteran(true)}
-                  className={`flex-1 py-2 px-3 rounded text-xs font-semibold transition-colors ${isVeteran ? 'bg-terracota-500 text-white' : 'bg-parchment-100/10 text-parchment-400 hover:text-parchment-100'}`}
+                  className={`flex-1 py-2 px-3 rounded text-xs font-semibold transition-colors ${isVeteran ? 'bg-terracota-500 text-white' : 'bg-black/[0.06] text-parchment-400 hover:text-parchment-100'}`}
                 >
                   Veterano
                 </button>
@@ -563,7 +563,7 @@ function RegisterForm({ tournamentId, onSuccess }: { tournamentId: number; onSuc
             value={sheet}
             onChange={setSheet}
           />
-          <div className="flex gap-2 pt-3 border-t border-parchment-100/10">
+          <div className="flex gap-2 pt-3 border-t border-black/8">
             <button type="button" onClick={() => setStep(1)} className="btn-secondary text-xs">← Atrás</button>
             <button type="submit" disabled={submitting || !playerId || !raceId} className="btn-primary text-xs inline-flex items-center gap-1.5">
               {submitting && <Spinner size="sm" />}

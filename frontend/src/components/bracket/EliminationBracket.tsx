@@ -26,9 +26,9 @@ function MatchCard({ match, tournament, onResultSubmitted }: {
   return (
     <div className="card min-w-[190px] max-w-[230px] overflow-hidden">
       {/* Home */}
-      <div className={`px-3 py-2.5 border-b border-parchment-100/10 flex items-center justify-between gap-2 ${homeWon ? 'bg-verde-500/10' : ''}`}>
+      <div className={`px-3 py-2.5 border-b border-black/8 flex items-center justify-between gap-2 ${homeWon ? 'bg-verde-500/10' : ''}`}>
         <div className="min-w-0">
-          <p className={`text-xs font-medium truncate ${homeWon ? 'text-emerald-700' : 'text-parchment-100'}`}>
+          <p className={`text-xs font-medium truncate ${homeWon ? 'text-verde-600' : 'text-parchment-100'}`}>
             {homeName}
           </p>
           {homeTeam && <p className="text-parchment-400/60 text-xs truncate">{homeTeam}</p>}
@@ -65,7 +65,7 @@ function MatchCard({ match, tournament, onResultSubmitted }: {
       </div>
 
       {canRegister && !showForm && match.homeParticipantId && match.awayParticipantId && (
-        <div className="px-3 py-1.5 border-t border-parchment-100/10">
+        <div className="px-3 py-1.5 border-t border-black/8">
           <button
             onClick={() => setShowForm(true)}
             className="text-xs text-verde-500 hover:text-verde-400 transition-colors"
@@ -76,7 +76,7 @@ function MatchCard({ match, tournament, onResultSubmitted }: {
       )}
 
       {showForm && (
-        <div className="px-3 pb-3 border-t border-parchment-100/10">
+        <div className="px-3 pb-3 border-t border-black/8">
           <MatchResultForm
             match={match}
             onSuccess={() => { setShowForm(false); onResultSubmitted(); }}

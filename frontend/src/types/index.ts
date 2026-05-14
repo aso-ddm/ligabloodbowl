@@ -48,6 +48,10 @@ export interface Participant {
   hasApothecary: boolean;
   teamValue: number;
   isVeteran: boolean;
+  cheerleaders?: number;
+  assistantCoaches?: number;
+  fanFactor?: number;
+  treasury?: number;
   player: Player;
   race: Race;
 }
@@ -63,6 +67,8 @@ export interface Match {
   awayTDs: number | null;
   homeCas: number | null;
   awayCas: number | null;
+  homeGold?: number | null;
+  awayGold?: number | null;
   status: MatchStatus;
   winnerId: number | null;
 }
@@ -175,5 +181,10 @@ export interface RosterEntryInput {
   playerName?: string;
   skillIds?: number[];
   spp?: number;
-  injuries?: string;
+  injured?: boolean;
+  mvUp?: number;
+  stUp?: number;
+  agUp?: number;
+  paUp?: number;
+  avUp?: number;
 }

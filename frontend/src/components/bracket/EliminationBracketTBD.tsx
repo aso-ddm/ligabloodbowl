@@ -66,7 +66,7 @@ function TBDMatchCard({ match }: { match: TBDMatch }) {
   return (
     <div className="card min-w-[190px] max-w-[230px] overflow-hidden opacity-70">
       {/* Home */}
-      <div className="px-3 py-2.5 border-b border-parchment-100/10">
+      <div className="px-3 py-2.5 border-b border-black/8">
         <p className={`text-xs font-medium truncate ${isTBD || match.home == null ? 'text-parchment-400/50 italic' : 'text-parchment-100'}`}>
           {match.home == null ? 'BYE' : match.home}
         </p>
